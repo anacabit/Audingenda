@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<title>Executive Agenda · by Acas</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d2240">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AudioAgenda">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('efwwRoO170ihM2Aqt');</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+
+  :root {
+    --blue: #0d2240;
+    --blue-mid: #0a1a30;
+    --blue-light: #1a3a5c;
+    --gold: #f5d76e;
+    --gold-dark: #c9a227;
+    --text: #ffffff;
+    --text-dim: #8bb4d8;
+    --text-muted: #4a6a8a;
+    --card: #0a1a30;
+    --border: rgba(197,162,39,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--blue);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ONBOARDING */
+  #onboarding {
+    position: fixed; inset: 0; background: var(--blue);
+    z-index: 1000; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 2rem;
+    text-align: center;
+  }
+  #onboarding .logo { font-size: 36px; font-weight: 900; color: var(--gold); letter-spacing: 6px; margin-bottom: 4px; }
+  #onboarding .logo-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2rem; }
+  #onboarding h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  #onboarding p { font-size: 13px; color: var(--text-dim); margin-bottom: 1.5rem; line-height: 1.6; }
+  #onboarding input {
+    width: 100%; padding: 12px 16px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--text); font-family: 'Montserrat', sans-serif;
+    font-size: 14px; margin-bottom: 10px; outline: none;
+  }
+  #onboarding input:focus { border-color: var(--gold-dark); }
+
+  /* Fix keyboard push */
+  body { height: 100dvh; overflow-y: auto; }
+  .bottom-nav { position: fixed; bottom: 0; }
+  @media (max-height: 500px) {
+    .bottom-nav { position: relative; }
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--blue); font-family: 'Montserrat', sans-serif;
+    font-weight: 900; font-size: 14px; border: none;
+    border-radius: 30px; padding: 13px 32px; cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase; width: 100%;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--blue-mid);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-logo { font-size: 18px; font-weight: 900; color: var(--gold); letter-spacing: 3px; }
+  .header-right { display: flex; gap: 10px; align-items: center; }
+  .greeting-bar {
+    background: var(--blue-mid); padding: 8px 16px;
+    font-size: 12px; color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .greeting-text { color: var(--gold); font-weight: 700; font-size: 12px; }
+  .listen-btn {
+    background: rgba(197,162,39,0.12); border: 0.5px solid var(--border);
+    border-radius: 20px; color: var(--gold); font-family: 'Montserrat', sans-serif;
+    font-size: 10px; font-weight: 700; padding: 5px 12px; cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex; background: var(--blue-mid);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 85px; z-index: 99;
+  }
+  .tab {
+    flex: 1; padding: 10px 4px; text-align: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-muted);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* SCREENS */
+  .screen { display: none; padding: 16px; padding-bottom: 80px; }
+  .screen.active { display: block; }
+
+  /* CALENDAR */
+  .month-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .month-title { font-size: 16px; font-weight: 700; color: var(--gold); }
+  .nav-arrow {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 20px; cursor: pointer; padding: 4px 10px;
+  }
+  .weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 2px; margin-bottom: 4px;
+  }
+  .weekday { text-align: center; font-size: 10px; color: var(--text-muted); padding: 4px 0; font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-day {
+    aspect-ratio: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 8px; cursor: pointer; font-size: 12px;
+    font-weight: 600; background: var(--card);
+    border: 0.5px solid rgba(255,255,255,0.04);
+    transition: background 0.15s; position: relative;
+  }
+  .cal-day:hover { background: var(--blue-light); }
+  .cal-day.today { border-color: var(--gold-dark); color: var(--gold); }
+  .cal-day.has-event::after {
+    content: ''; position: absolute; bottom: 3px;
+    width: 4px; height: 4px; border-radius: 50%; background: var(--gold);
+  }
+  .cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+  .sticker { font-size: 10px; }
+
+  /* DAY MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 300; display: none; align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex !important; pointer-events: all; }
+  .modal input, .modal textarea, .modal select { pointer-events: all; }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--blue-mid); border-radius: 20px 20px 0 0;
+    padding: 20px 16px 32px; width: 100%;
+    border-top: 1px solid var(--border); max-height: 85vh; overflow-y: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .modal-title { font-size: 15px; font-weight: 700; color: var(--gold); }
+  .close-btn { background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
+  .activity-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .act-type {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 10px 6px; text-align: center;
+    cursor: pointer; font-size: 11px; color: var(--text-dim);
+    font-weight: 600; transition: all 0.15s;
+  }
+  .act-type:hover, .act-type.selected { background: rgba(197,162,39,0.12); color: var(--gold); border-color: var(--gold-dark); }
+  .act-type span { display: block; font-size: 20px; margin-bottom: 4px; }
+  .form-field { margin-bottom: 12px; }
+  .form-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 0.5px solid var(--border); background: var(--card);
+    color: var(--text); font-family: 'Montserrat', sans-serif;
+    font-size: 13px; outline: none;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--gold-dark); }
+  .form-textarea { min-height: 80px; resize: vertical; }
+  .sticker-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .sticker-opt { font-size: 22px; cursor: pointer; padding: 4px; border-radius: 6px; border: 1px solid transparent; }
+  .sticker-opt.selected { border-color: var(--gold-dark); background: rgba(197,162,39,0.1); }
+  .activities-list { margin-top: 12px; }
+  .activity-item {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .activity-info { flex: 1; }
+  .activity-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .activity-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .del-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 2px; }
+  .audio-controls { display: flex; gap: 8px; margin-top: 8px; }
+  .audio-btn {
+    flex: 1; padding: 10px; border-radius: 8px; border: 0.5px solid var(--border);
+    background: var(--card); color: var(--text-dim); font-family: 'Montserrat', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+  }
+  .audio-btn.record { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+  .audio-btn.active { background: rgba(255,107,107,0.1); }
+  .wa-tip { font-size: 11px; color: var(--text-dim); background: rgba(197,162,39,0.06); border-radius: 8px; padding: 8px; margin-top: 8px; line-height: 1.5; }
+
+  /* NEWS */
+  .news-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .news-title-bar { font-size: 14px; font-weight: 700; color: var(--gold); }
+  .sources-btn {
+    background: rgba(197,162,39,0.1); border: 0.5px solid var(--border);
+    border-radius: 20px; color: var(--gold); font-family: 'Montserrat', sans-serif;
+    font-size: 10px; font-weight: 700; padding: 6px 12px; cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .news-card {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 10px;
+  }
+  .news-source { font-size: 10px; color: var(--gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .news-headline { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; }
+  .news-date { font-size: 11px; color: var(--text-muted); }
+  .no-news { text-align: center; color: var(--text-muted); font-size: 13px; padding: 2rem; line-height: 1.8; }
+
+  /* TO-DO */
+  .todo-add { display: flex; gap: 8px; margin-bottom: 16px; }
+  .todo-input {
+    flex: 1; padding: 11px 14px; border-radius: 10px;
+    border: 0.5px solid var(--border); background: var(--card);
+    color: var(--text); font-family: 'Montserrat', sans-serif;
+    font-size: 13px; outline: none;
+  }
+  .todo-input:focus { border-color: var(--gold-dark); }
+  .todo-add-btn {
+    background: var(--gold-dark); border: none; border-radius: 10px;
+    color: var(--blue); font-size: 20px; font-weight: 900;
+    width: 44px; cursor: pointer;
+  }
+  .todo-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 8px;
+  }
+  .todo-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--gold-dark); background: none;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-size: 12px;
+  }
+  .todo-check.done { background: var(--gold-dark); }
+  .todo-text { flex: 1; font-size: 13px; }
+  .todo-text.done { text-decoration: line-through; color: var(--text-muted); }
+  .todo-del { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; }
+  .clear-done {
+    background: rgba(255,100,100,0.08); border: 0.5px solid rgba(255,100,100,0.2);
+    border-radius: 8px; color: #ff8888; font-family: 'Montserrat', sans-serif;
+    font-size: 11px; font-weight: 700; padding: 8px 14px; cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* CALCULATOR */
+  .calc-display {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 16px; margin-bottom: 12px; text-align: right;
+  }
+  .calc-history { font-size: 11px; color: var(--text-muted); min-height: 16px; margin-bottom: 4px; }
+  .calc-value { font-size: 32px; font-weight: 700; color: var(--gold); word-break: break-all; }
+  .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .calc-btn {
+    padding: 16px 8px; border-radius: 10px; border: none;
+    font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.1s;
+    background: var(--card); color: var(--text);
+    border: 0.5px solid var(--border);
+  }
+  .calc-btn:active { opacity: 0.7; }
+  .calc-btn.op { color: var(--gold); }
+  .calc-btn.eq { background: var(--gold-dark); color: var(--blue); border-color: var(--gold-dark); }
+  .calc-btn.clear { color: #ff8888; }
+  .calc-btn.span2 { grid-column: span 2; }
+
+  /* VOICE SETTINGS */
+  .voice-section { margin-bottom: 20px; }
+  .voice-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .voice-select {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 0.5px solid var(--border); background: var(--card);
+    color: var(--text); font-family: 'Montserrat', sans-serif;
+    font-size: 13px; outline: none; margin-bottom: 12px;
+  }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .slider-label { font-size: 11px; color: var(--text-dim); width: 50px; }
+  input[type=range] { flex: 1; accent-color: var(--gold-dark); }
+  .slider-val { font-size: 12px; color: var(--gold); width: 35px; text-align: right; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .toggle-label { font-size: 13px; color: var(--text); }
+  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: var(--blue-light);
+    border-radius: 24px; cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--gold-dark); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+  /* PRIVACY */
+  .privacy-box {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    font-size: 12px; color: var(--text-dim); line-height: 1.8;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 11px; letter-spacing: 2px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 12px; margin-top: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--blue-mid); border-top: 1px solid var(--border);
+    display: flex; z-index: 100;
+  }
+  .nav-item {
+    flex: 1; padding: 10px 4px 12px; text-align: center;
+    cursor: pointer; color: var(--text-muted); transition: color 0.2s;
+  }
+  .nav-item.active { color: var(--gold); }
+  .nav-icon { font-size: 20px; margin-bottom: 2px; }
+  .nav-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* GOLD BAR */
+  .gold-bar { height: 3px; background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-dark)); }
+
+  /* INSTRUCTIONS */
+  .instr-card {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 10px;
+  }
+  .instr-icon { font-size: 20px; margin-bottom: 6px; }
+  .instr-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+  .instr-text { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+  .instr-text ul { padding-left: 1.2rem; margin-top: 4px; }
+  .instr-text li { margin-bottom: 4px; }
+
+  .version-tag { font-size: 10px; color: var(--text-muted); text-align: center; padding: 1rem; letter-spacing: 1px; }
+
+  /* SOURCES MODAL */
+  .source-item {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .source-info { flex: 1; }
+  .source-name { font-size: 13px; font-weight: 600; }
+  .source-cat { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="logo">ACAS</div>
+  <div class="logo-sub">Executive Agenda · Digital</div>
+  <h2 style="margin-bottom:6px;">Welcome!</h2>
+  <p>Enter your details and activation code to start.</p>
+  <input type="text" id="nameInput" placeholder="Your full name" maxlength="40">
+  <input type="email" id="emailInput" placeholder="Your email address">
+  <input type="text" id="codeInput" placeholder="Activation code (2026-ACAS-ENG-XXXX)" maxlength="25" style="letter-spacing:1px; text-transform:uppercase;">
+  <div id="registerStatus" style="font-size:12px; min-height:18px; margin-bottom:8px; color:#f5a623; text-align:center;"></div>
+  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;text-align:left;">
+    <input type="checkbox" id="acceptTerms" style="width:18px;height:18px;margin-top:2px;accent-color:#c9a227;flex-shrink:0;">
+    <label for="acceptTerms" style="font-size:11px;color:#8bb4d8;line-height:1.5;">I have read and accept the <span style="color:#f5d76e;font-weight:700;">Terms and Conditions of Use</span>. I understand this is a personal license and the code is non-transferable.</label>
+  </div>
+  <button class="btn-gold" onclick="registerUser()">Activate My Agenda ✓</button>
+  <p style="font-size:10px; color:#3a5a7a; margin-top:14px;">No code? Contact Acas to get yours.</p>
+</div>
+
+<!-- GOLD BAR -->
+<div class="gold-bar"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-logo">ACAS</div>
+  <div class="header-right">
+    <button class="listen-btn" onclick="speakAgenda()">🎙️ Listen</button>
+    <button class="listen-btn" onclick="showScreen('settings')" style="font-size:16px; padding:5px 10px;">⚙️</button>
+  </div>
+</header>
+<div class="greeting-bar">
+  <span class="greeting-text" id="greetingText">Good Morning</span>
+  <span id="dateText" style="font-size:11px; color:var(--text-muted);"></span>
+</div>
+
+<!-- SCREENS -->
+<div id="screen-calendar" class="screen active">
+  <div class="month-nav">
+    <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
+    <div class="month-title" id="monthTitle"></div>
+    <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="weekdays">
+    <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
+    <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<div id="screen-news" class="screen">
+  <div class="news-header">
+    <div class="news-title-bar">📰 Daily News</div>
+    <button class="sources-btn" onclick="openSources()">⚙️ Sources</button>
+  </div>
+  <div class="news-filter" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="newsFilter"></div>
+  <div id="newsFeed">
+    <div class="no-news">Tap 🔄 Refresh to load today's headlines.</div>
+  </div>
+  <button onclick="loadNews()" style="width:100%;padding:11px;background:rgba(197,162,39,0.1);border:0.5px solid var(--border);border-radius:10px;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px;margin-top:4px;">🔄 Refresh News</button>
+</div>
+
+<div id="screen-todo" class="screen">
+  <div class="section-title">To-Do List</div>
+  <div class="todo-add">
+    <input class="todo-input" id="todoInput" placeholder="New task..." onkeydown="if(event.key==='Enter')addTodo()">
+    <button class="todo-add-btn" onclick="addTodo()">+</button>
+  </div>
+  <button class="clear-done" onclick="clearDone()">🗑️ Clear completed</button>
+  <div id="todoList"></div>
+</div>
+
+<div id="screen-calc" class="screen">
+  <div class="section-title">Calculator</div>
+  <div class="calc-display">
+    <div class="calc-history" id="calcHistory"></div>
+    <div class="calc-value" id="calcDisplay">0</div>
+  </div>
+  <div class="calc-grid">
+    <button class="calc-btn clear" onclick="calcClear()">C</button>
+    <button class="calc-btn op" onclick="calcOp('%')">%</button>
+    <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+    <button class="calc-btn op" onclick="calcOp('*')">×</button>
+    <button class="calc-btn" onclick="calcNum('7')">7</button>
+    <button class="calc-btn" onclick="calcNum('8')">8</button>
+    <button class="calc-btn" onclick="calcNum('9')">9</button>
+    <button class="calc-btn op" onclick="calcOp('-')">−</button>
+    <button class="calc-btn" onclick="calcNum('4')">4</button>
+    <button class="calc-btn" onclick="calcNum('5')">5</button>
+    <button class="calc-btn" onclick="calcNum('6')">6</button>
+    <button class="calc-btn op" onclick="calcOp('+')">+</button>
+    <button class="calc-btn" onclick="calcNum('1')">1</button>
+    <button class="calc-btn" onclick="calcNum('2')">2</button>
+    <button class="calc-btn" onclick="calcNum('3')">3</button>
+    <button class="calc-btn eq" onclick="calcEquals()" style="grid-row:span 2">=</button>
+    <button class="calc-btn span2" onclick="calcNum('0')">0</button>
+    <button class="calc-btn" onclick="calcDot()">.</button>
+  </div>
+</div>
+
+<div id="screen-settings" class="screen">
+  <div class="section-title">Voice Settings</div>
+  <div class="voice-section">
+    <span class="voice-label">Available Voices</span>
+    <select class="voice-select" id="voiceSelect" onchange="updateVoice()"></select>
+    <div class="slider-row">
+      <span class="slider-label">Speed</span>
+      <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateSliders()">
+      <span class="slider-val" id="rateVal">1.0x</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Pitch</span>
+      <input type="range" id="pitchSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateSliders()">
+      <span class="slider-val" id="pitchVal">Normal</span>
+    </div>
+    <button class="btn-gold" style="margin-bottom:16px;" onclick="testVoice()">Test Voice</button>
+    <div class="toggle-row">
+      <span class="toggle-label">Speak automatically on open</span>
+      <label class="toggle"><input type="checkbox" id="autoSpeak" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="section-title">Your Name</div>
+  <div class="form-field">
+    <input class="form-input" id="nameEdit" placeholder="Your name">
+    <button class="btn-gold" style="margin-top:8px;" onclick="saveName()">Save Name</button>
+  </div>
+
+  <div class="section-title">Instructions</div>
+  <div class="instr-card">
+    <div class="instr-icon">📅</div>
+    <div class="instr-title">Calendar</div>
+    <div class="instr-text">Tap any day to open it. The app will automatically read your activities for that day aloud.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">📝</div>
+    <div class="instr-title">Note</div>
+    <div class="instr-text">Write free-form text to remember something. Add a sticker to identify it on the calendar.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">📅</div>
+    <div class="instr-title">Event</div>
+    <div class="instr-text">Schedule an appointment with a time and location.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">🎙️</div>
+    <div class="instr-title">Audio</div>
+    <div class="instr-text">Record a voice message. Tap ⏺ Record, speak, then ⏹ Stop. Listen before saving.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">💬</div>
+    <div class="instr-title">WhatsApp</div>
+    <div class="instr-text">Enter your message in the Title field and the phone number including country code, no spaces (e.g., 584141234567). After saving, tap "Open WhatsApp" to send directly.
+      <br><br>💡 <strong>Tip:</strong> If you don't have the contact's number, enter your own. The message will arrive in your WhatsApp and you can forward it to anyone.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">📰</div>
+    <div class="instr-title">News — Add Sources</div>
+    <div class="instr-text">Tap the News tab → ⚙️ Sources button.
+      <ul>
+        <li>Toggle each outlet on or off using the switch</li>
+        <li>To add your own source: enter the name, emoji, category, and RSS feed URL</li>
+        <li>Tap ✓ Done — refresh news to see the changes</li>
+      </ul>
+    </div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">🧮</div>
+    <div class="instr-title">Calculator</div>
+    <div class="instr-text">Tap numbers and operators (+, −, ×, ÷). Use % for percentages. Tap C to clear.</div>
+  </div>
+  <div class="instr-card">
+    <div class="instr-icon">✅</div>
+    <div class="instr-title">To-Do List</div>
+    <div class="instr-text">
+      <ul>
+        <li>Tap + New task to add an item</li>
+        <li>Tap ○ to mark it as done ✓</li>
+        <li>Tap ✕ to delete a task</li>
+        <li>Tap 🗑️ Clear completed to remove all finished tasks at once</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">Send by Email ✉️</div>
+  <div class="instr-card">
+    <div class="form-field">
+      <label class="form-label">Recipient email</label>
+      <input class="form-input" id="emailTo" placeholder="example@email.com" type="email" style="margin-bottom:8px;">
+      <label class="form-label">Subject</label>
+      <input class="form-input" id="emailSubject" placeholder="My agenda for today..." style="margin-bottom:8px;">
+      <label class="form-label">Message</label>
+      <textarea class="form-textarea" id="emailBody" placeholder="Write your message here..."></textarea>
+    </div>
+    <button class="btn-gold" style="margin-top:8px;" onclick="sendEmail()">Send Email ✉️</button>
+    <div id="emailStatus" style="font-size:12px; color:var(--text-dim); margin-top:10px; text-align:center;"></div>
+  </div>
+
+  <div class="section-title">Privacy</div>
+  <div class="privacy-box">
+    This app does not collect, store, or transmit any personal data. All information (notes, events, and audio recordings) is saved solely on this device and never leaves it. WhatsApp messages open directly in your WhatsApp app — this app has no access to your chats. Recorded audio stays on your phone. We do not use cookies, external servers, or analytics services. By using this app, you agree to these terms.
+  </div>
+  <div class="section-title">Terms &amp; Conditions</div>
+  <div class="privacy-box" style="line-height:1.9;">
+    <p style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Terms and Conditions of Use — Audio Agenda</p>
+    <p style="margin-bottom:10px;font-size:11px;">By downloading, installing, activating, or using this digital product, you (the "Buyer" or "User") expressly agree to be bound by the following terms and conditions:</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">1. PERSONAL AND SINGLE LICENSE</p>
+    <p style="margin-bottom:10px;font-size:11px;">This product and its access file are for the personal and exclusive use of the Buyer. Reselling, redistributing, sharing, modifying, or publishing this product on any physical or digital platform is strictly prohibited.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">2. ACCESS CODE AND DEVICES</p>
+    <p style="margin-bottom:10px;font-size:11px;">The access code you receive is unique, non-transferable, and tied to the buyer's registration. Using it on more than one unauthorized device, assigning it, or sharing it with third parties constitutes a serious breach of these terms and will result in the immediate revocation of access without the right to a refund.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">3. INTELLECTUAL PROPERTY</p>
+    <p style="margin-bottom:10px;font-size:11px;">Audio Agenda is an original creation under the Acas brand. All copyright, design, and intellectual property rights are reserved and protected by international laws. The purchase grants a license of use and does not transfer ownership of the product.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">4. DISCLAIMER OF WARRANTIES ("AS IS")</p>
+    <p style="margin-bottom:10px;font-size:11px;">The digital product is provided "as is" and "as available". The creator assumes no responsibility for technical incompatibilities, malfunctions of the user's device, data loss, or damages arising from the use of the product. The total and maximum liability of the creator for any claim shall be strictly limited to the amount actually paid by the Buyer.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">5. NO-REFUND POLICY</p>
+    <p style="margin-bottom:10px;font-size:11px;">Due to the nature of downloadable and intangible digital products, no returns, cancellations, or refunds are accepted once the payment has been made and/or the material or code has been downloaded.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">6. UPDATES AND SUPPORT</p>
+    <p style="margin-bottom:10px;font-size:11px;">Future product updates may require a new access code or specific conditions. Technical support is provided through the official customer service channels established for the sale.</p>
+
+    <p style="color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px;">7. LEGAL ACCEPTANCE</p>
+    <p style="margin-bottom:10px;font-size:11px;">By purchasing, using the code, or downloading this product, the Buyer confirms having read, understood, and accepted all of these terms, serving this record as legal proof against any claim or payment gateway dispute.</p>
+
+    <p style="font-size:11px;color:var(--gold-dark);font-weight:700;text-align:center;margin-top:6px;">© 2026 Acas. All rights reserved.</p>
+  </div>
+
+  <div class="version-tag">Audio Agenda · by Acas · v3.2.0-EN</div>
+</div>
+
+<!-- DAY MODAL -->
+<div class="modal-overlay" id="dayModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalDayTitle">Monday, Jan 1</div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="activities-list" id="activitiesList"></div>
+
+    <div class="section-title" style="margin-top:12px;">Add Activity</div>
+    <div class="activity-type-grid">
+      <div class="act-type selected" id="type-note" onclick="selectType('note')"><span>📝</span>Note</div>
+      <div class="act-type" id="type-event" onclick="selectType('event')"><span>📅</span>Event</div>
+      <div class="act-type" id="type-audio" onclick="selectType('audio')"><span>🎙️</span>Audio</div>
+      <div class="act-type" id="type-whatsapp" onclick="selectType('whatsapp')"><span>💬</span>WhatsApp</div>
+      <div class="act-type" id="type-reminder" onclick="selectType('reminder')"><span>🔔</span>Reminder</div>
+      <div class="act-type" id="type-sticker" onclick="selectType('sticker')"><span>🎨</span>Sticker</div>
+    </div>
+
+    <div id="formNote">
+      <div class="form-field">
+        <label class="form-label">Note</label>
+        <textarea class="form-textarea" id="noteText" placeholder="Write your note here..."></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Sticker</label>
+        <div class="sticker-row" id="stickerRow">
+          <span class="sticker-opt" onclick="selectSticker(this)">⭐</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">❤️</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">✅</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🔥</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">💡</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">📌</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🎯</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🏆</span>
+        </div>
+      </div>
+      <button class="btn-gold" onclick="saveActivity()">Save</button>
+    </div>
+
+    <div id="formEvent" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Event name</label>
+        <input class="form-input" id="eventName" placeholder="Appointment, meeting...">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Time</label>
+        <input class="form-input" type="time" id="eventTime">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Location (optional)</label>
+        <input class="form-input" id="eventLocation" placeholder="Address or place">
+      </div>
+      <button class="btn-gold" onclick="saveActivity()">Save</button>
+    </div>
+
+    <div id="formAudio" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Voice message</label>
+        <div class="audio-controls">
+          <button class="audio-btn record" id="recBtn" onclick="toggleRecord()">⏺ Record</button>
+          <button class="audio-btn" id="playBtn" onclick="playAudio()" disabled>▶ Listen</button>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:8px;" id="recStatus">Tap Record to start.</div>
+      </div>
+      <button class="btn-gold" onclick="saveActivity()">Save</button>
+    </div>
+
+    <div id="formWhatsapp" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" id="waMessage" placeholder="Write the message to send..."></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Phone number (with country code)</label>
+        <input class="form-input" id="waPhone" placeholder="584141234567" type="tel">
+      </div>
+      <div class="wa-tip">💡 <strong>Tip:</strong> Enter your own number to forward the message yourself.</div>
+      <button class="btn-gold" style="margin-top:12px;" onclick="saveActivity()">Save</button>
+    </div>
+
+    <div id="formReminder" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Reminder</label>
+        <input class="form-input" id="reminderText" placeholder="What do you need to remember?">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Time (optional)</label>
+        <input class="form-input" type="time" id="reminderTime">
+      </div>
+      <button class="btn-gold" onclick="saveActivity()">Save</button>
+    </div>
+
+    <div id="formSticker" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Choose a sticker for this day</label>
+        <div class="sticker-row">
+          <span class="sticker-opt" onclick="selectSticker(this)">⭐</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">❤️</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">✅</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🔥</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">💡</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">📌</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🎯</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🏆</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🎨</span>
+          <span class="sticker-opt" onclick="selectSticker(this)">🌟</span>
+        </div>
+      </div>
+      <button class="btn-gold" onclick="saveActivity()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOURCES MODAL -->
+<div class="modal-overlay" id="sourcesModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ News Sources</div>
+      <button class="close-btn" onclick="closeSources()">✓ Done</button>
+    </div>
+    <div id="sourcesList"></div>
+    <div class="section-title" style="margin-top:12px;">Add Source</div>
+    <div class="form-field">
+      <input class="form-input" id="srcName" placeholder="Source name" style="margin-bottom:8px;">
+      <input class="form-input" id="srcEmoji" placeholder="Emoji (e.g. 📰)" style="margin-bottom:8px;">
+      <input class="form-input" id="srcCat" placeholder="Category (e.g. Technology)" style="margin-bottom:8px;">
+      <input class="form-input" id="srcUrl" placeholder="RSS feed URL">
+    </div>
+    <button class="btn-gold" onclick="addSource()">Add Source</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showScreen('calendar')" id="nav-calendar">
+    <div class="nav-icon">📅</div><div class="nav-label">Agenda</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('news')" id="nav-news">
+    <div class="nav-icon">📰</div><div class="nav-label">News</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('todo')" id="nav-todo">
+    <div class="nav-icon">✅</div><div class="nav-label">To-Do</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('calc')" id="nav-calc">
+    <div class="nav-icon">🧮</div><div class="nav-label">Calc</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('settings')" id="nav-settings">
+    <div class="nav-icon">⚙️</div><div class="nav-label">Settings</div>
+  </div>
+</div>
+
+<script>
+// STATE
+let userName = '', currentMonth, currentYear, selectedDay = null;
+let activities = {}, todos = [], sources = [], selectedType = 'note';
+let selectedSticker = '', calcVal = '', calcOp2 = '', calcPrev = '', calcNewNum = true;
+let mediaRecorder = null, audioBlob = null, audioUrl = null, recording = false;
+let voices = [], selectedVoice = null, speechRate = 1, speechPitch = 1, autoSpeak = true;
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function load() {
+  const d = localStorage;
+  userName = d.getItem('acas_name') || '';
+  activities = JSON.parse(d.getItem('acas_acts') || '{}');
+  todos = JSON.parse(d.getItem('acas_todos') || '[]');
+  const DEFAULT_SOURCES = [
+    { name: 'BBC World', emoji: '🌍', category: 'World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
+    { name: 'Reuters', emoji: '📡', category: 'World', url: 'https://feeds.reuters.com/reuters/topNews' },
+    { name: 'CNN', emoji: '🇺🇸', category: 'USA', url: 'http://rss.cnn.com/rss/edition.rss' },
+    { name: 'NPR News', emoji: '🎙️', category: 'USA', url: 'https://feeds.npr.org/1001/rss.xml' },
+    { name: 'AP News', emoji: '📰', category: 'USA', url: 'https://rsshub.app/apnews/topics/apf-topnews' },
+    { name: 'El Nacional (VE)', emoji: '🇻🇪', category: 'Venezuela', url: 'https://www.el-nacional.com/feed/' },
+    { name: 'Efecto Cocuyo', emoji: '🪲', category: 'Venezuela', url: 'https://efectococuyo.com/feed/' },
+    { name: 'Tal Cual', emoji: '📢', category: 'Venezuela', url: 'https://talcualdigital.com/feed/' },
+    { name: 'Euronews EN', emoji: '🇪🇺', category: 'Europe', url: 'https://feeds.feedburner.com/euronews/en/news/' },
+    { name: 'The Guardian', emoji: '🇬🇧', category: 'Europe', url: 'https://www.theguardian.com/world/rss' },
+    { name: 'DW News', emoji: '🇩🇪', category: 'Europe', url: 'https://rss.dw.com/rdf/rss-en-all' },
+    { name: 'Al Jazeera', emoji: '🌐', category: 'World', url: 'https://www.aljazeera.com/xml/rss/all.xml' }
+  ];
+  const saved = d.getItem('acas_sources');
+  sources = saved ? JSON.parse(saved) : [...DEFAULT_SOURCES];
+  speechRate = parseFloat(d.getItem('acas_rate') || '1');
+  speechPitch = parseFloat(d.getItem('acas_pitch') || '1');
+  autoSpeak = d.getItem('acas_auto') !== 'false';
+  if (d.getItem('acas_voice')) selectedVoice = d.getItem('acas_voice');
+}
+
+function save() {
+  localStorage.setItem('acas_name', userName);
+  localStorage.setItem('acas_acts', JSON.stringify(activities));
+  localStorage.setItem('acas_todos', JSON.stringify(todos));
+  localStorage.setItem('acas_sources', JSON.stringify(sources));
+}
+
+function saveSettings() {
+  localStorage.setItem('acas_rate', speechRate);
+  localStorage.setItem('acas_pitch', speechPitch);
+  localStorage.setItem('acas_auto', autoSpeak);
+  if (selectedVoice) localStorage.setItem('acas_voice', selectedVoice);
+}
+
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxjt0r8OWvInXtKssNvPVXvfmuatfNR5AEQLRvohRurCiTG2yqMq_A4mBoGEaI4zdmQyg/exec';
+
+function registerUser() {
+  const name  = document.getElementById('nameInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const code  = document.getElementById('codeInput').value.trim().toUpperCase();
+  const status = document.getElementById('registerStatus');
+  const accepted = document.getElementById('acceptTerms').checked;
+
+  if (!name || !email || !code) {
+    status.textContent = '⚠️ Please fill in all fields.';
+    status.style.color = '#f5a623';
+    return;
+  }
+  if (!accepted) {
+    status.textContent = '⚠️ Please accept the Terms and Conditions.';
+    status.style.color = '#f5a623';
+    return;
+  }
+
+  status.textContent = 'Verifying your code...';
+  status.style.color = '#8bb4d8';
+
+  const url = SHEET_URL + '?' + new URLSearchParams({ code, name, email, version: 'EN-3.2' }).toString();
+
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        userName = name;
+        localStorage.setItem('acas_registered', 'true');
+        save();
+        document.getElementById('onboarding').style.display = 'none';
+        document.getElementById('nameEdit').value = name;
+        status.textContent = '';
+        init();
+      } else {
+        status.textContent = '❌ ' + (data.msg || 'Invalid code. Try again.');
+        status.style.color = '#ff8888';
+      }
+    })
+    .catch(() => {
+      status.textContent = '❌ Connection error. Check your internet.';
+      status.style.color = '#ff8888';
+    });
+}
+
+function init() {
+  const now = new Date();
+  currentMonth = now.getMonth();
+  currentYear = now.getFullYear();
+  updateGreeting();
+  renderCalendar();
+  renderTodos();
+  loadVoices();
+  document.getElementById('rateSlider').value = speechRate;
+  document.getElementById('pitchSlider').value = speechPitch;
+  document.getElementById('autoSpeak').checked = autoSpeak;
+  document.getElementById('nameEdit').value = userName;
+  updateSliders();
+  if (autoSpeak && userName) setTimeout(speakGreeting, 800);
+}
+
+function updateGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+  document.getElementById('greetingText').textContent = userName ? `${g}, ${userName}!` : g;
+  const now = new Date();
+  document.getElementById('dateText').textContent = now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+
+// CALENDAR
+function renderCalendar() {
+  document.getElementById('monthTitle').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  const first = new Date(currentYear, currentMonth, 1).getDay();
+  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const today = new Date();
+
+  for (let i = 0; i < first; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= days; d++) {
+    const key = `${currentYear}-${currentMonth+1}-${d}`;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear())
+      el.classList.add('today');
+    const acts = activities[key] || [];
+    const sticker = acts.find(a => a.sticker);
+    el.innerHTML = sticker ? `<span class="sticker">${sticker.sticker}</span><small style="font-size:10px;">${d}</small>` : d;
+    if (acts.length) el.classList.add('has-event');
+    el.onclick = () => openDay(d, key);
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  renderCalendar();
+}
+
+// DAY MODAL
+function openDay(day, key) {
+  selectedDay = key;
+  const date = new Date(currentYear, currentMonth, day);
+  document.getElementById('modalDayTitle').textContent = date.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  renderActivities();
+  selectType('note');
+  document.getElementById('dayModal').classList.add('open');
+  // Read day activities aloud
+  const acts = activities[key] || [];
+  if (acts.length) {
+    const nonAudio = acts.filter(a => a.type !== 'audio');
+    if (nonAudio.length) {
+      const list = nonAudio.map(a => `${a.title}${a.meta ? ' at ' + a.meta : ''}`).join(', ');
+      const text = `${date.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}. You have ${nonAudio.length === 1 ? 'one activity' : nonAudio.length + ' activities'}: ${list}.`;
+      setTimeout(() => speak(text), 600);
+    }
+  }
+}
+
+function closeModal() {
+  document.getElementById('dayModal').classList.remove('open');
+  selectedDay = null; audioBlob = null; audioUrl = null;
+}
+
+function renderActivities() {
+  const list = document.getElementById('activitiesList');
+  const acts = activities[selectedDay] || [];
+  if (!acts.length) { list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">No activities for this day.</div>'; return; }
+  list.innerHTML = acts.map((a, i) => `
+    <div class="activity-item">
+      <div class="activity-info">
+        <div class="activity-name">${a.sticker||''} ${a.title}</div>
+        ${a.meta ? `<div class="activity-meta">${a.meta}</div>` : ''}
+        ${a.type==='whatsapp' && a.phone ? `<button onclick="openWA('${a.phone}','${encodeURIComponent(a.title)}')" style="margin-top:6px;background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.3);border-radius:6px;color:#25d366;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;">Open WhatsApp</button>` : ''}
+      </div>
+      <button class="del-btn" onclick="deleteActivity(${i})">✕</button>
+    </div>`).join('');
+}
+
+function selectType(t) {
+  selectedType = t;
+  ['note','event','audio','whatsapp','reminder','sticker'].forEach(x => {
+    document.getElementById('type-'+x).classList.toggle('selected', x===t);
+    document.getElementById('form'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = x===t ? 'block' : 'none';
+  });
+}
+
+function selectSticker(el) {
+  document.querySelectorAll('.sticker-opt').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSticker = el.textContent;
+}
+
+function saveActivity() {
+  if (!selectedDay) return;
+  let act = { type: selectedType, title: '', sticker: selectedSticker };
+
+  if (selectedType === 'note') {
+    act.title = document.getElementById('noteText').value.trim() || 'Note';
+  } else if (selectedType === 'event') {
+    act.title = document.getElementById('eventName').value.trim() || 'Event';
+    const t = document.getElementById('eventTime').value;
+    const loc = document.getElementById('eventLocation').value.trim();
+    act.meta = [t, loc].filter(Boolean).join(' · ');
+  } else if (selectedType === 'audio') {
+    act.title = '🎙️ Voice message';
+    if (audioUrl) act.audioUrl = audioUrl;
+  } else if (selectedType === 'whatsapp') {
+    act.title = document.getElementById('waMessage').value.trim() || 'WhatsApp message';
+    act.phone = document.getElementById('waPhone').value.trim();
+    act.meta = act.phone ? `📱 ${act.phone}` : '';
+  } else if (selectedType === 'reminder') {
+    act.title = document.getElementById('reminderText').value.trim() || 'Reminder';
+    const t = document.getElementById('reminderTime').value;
+    act.meta = t ? `⏰ ${t}` : '';
+  } else if (selectedType === 'sticker') {
+    act.title = 'Sticker';
+    act.sticker = selectedSticker;
+  }
+
+  if (!activities[selectedDay]) activities[selectedDay] = [];
+  activities[selectedDay].push(act);
+  save();
+  renderActivities();
+  renderCalendar();
+  selectedSticker = '';
+}
+
+function deleteActivity(i) {
+  activities[selectedDay].splice(i, 1);
+  if (!activities[selectedDay].length) delete activities[selectedDay];
+  save(); renderActivities(); renderCalendar();
+}
+
+function openWA(phone, msg) {
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+}
+
+// AUDIO
+function toggleRecord() {
+  if (!recording) {
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+      mediaRecorder = new MediaRecorder(stream);
+      let chunks = [];
+      mediaRecorder.ondataavailable = e => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        audioBlob = new Blob(chunks, {type:'audio/webm'});
+        audioUrl = URL.createObjectURL(audioBlob);
+        document.getElementById('playBtn').disabled = false;
+        document.getElementById('recStatus').textContent = 'Recording ready. Tap Listen to review.';
+      };
+      mediaRecorder.start();
+      recording = true;
+      document.getElementById('recBtn').textContent = '⏹ Stop';
+      document.getElementById('recBtn').classList.add('active');
+      document.getElementById('recStatus').textContent = '● Recording...';
+    }).catch(() => {
+      document.getElementById('recStatus').textContent = 'Microphone access denied.';
+    });
+  } else {
+    mediaRecorder.stop();
+    recording = false;
+    document.getElementById('recBtn').textContent = '⏺ Record';
+    document.getElementById('recBtn').classList.remove('active');
+  }
+}
+
+function playAudio() {
+  if (audioUrl) new Audio(audioUrl).play();
+}
+
+// NEWS
+function openSources() {
+  renderSources();
+  document.getElementById('sourcesModal').classList.add('open');
+}
+
+let activeFilter = 'All';
+
+function renderNewsFilters() {
+  const cats = ['All', ...new Set(sources.map(s => s.category))];
+  const el = document.getElementById('newsFilter');
+  if (!el) return;
+  el.innerHTML = cats.map(c => `
+    <button onclick="setFilter('${c}')" style="padding:5px 12px;border-radius:20px;border:0.5px solid ${c===activeFilter?'var(--gold-dark)':'var(--border)'};background:${c===activeFilter?'rgba(197,162,39,0.15)':'var(--card)'};color:${c===activeFilter?'var(--gold)':'var(--text-muted)'};font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;">${c}</button>
+  `).join('');
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  renderNewsFilters();
+  loadNews();
+}
+
+function loadNews() {
+  const feed = document.getElementById('newsFeed');
+  feed.innerHTML = '<div class="no-news">Loading headlines...</div>';
+  renderNewsFilters();
+
+  const filtered = activeFilter === 'All' ? sources : sources.filter(s => s.category === activeFilter);
+  if (!filtered.length) {
+    feed.innerHTML = '<div class="no-news">No sources for this category.<br>Add sources using ⚙️ Sources.</div>';
+    return;
+  }
+
+  // ── PROXIES with automatic fallback ──
+  const PROXIES = [
+    { type: 'gas',        url: 'https://script.google.com/macros/s/AKfycbz8GhPhYcj215e11K0mDbN-SaP405JPxqWbFmS7G6bOnaHSW_tkrerFq53dcK7QwoME/exec?url=' },
+    { type: 'allorigins', url: 'https://api.allorigins.win/get?url=' },
+    { type: 'corsproxy',  url: 'https://corsproxy.io/?' },
+  ];
+
+  async function fetchWithProxy(feedUrl) {
+    for (const proxy of PROXIES) {
+      try {
+        const res = await fetch(`${proxy.url}${encodeURIComponent(feedUrl)}`);
+        let xml;
+        if (proxy.type === 'allorigins') {
+          const json = await res.json();
+          xml = json.contents;
+        } else {
+          xml = await res.text();
+        }
+        if (!xml) throw new Error('empty');
+        return xml;
+      } catch(e) { /* try next */ }
+    }
+    return null;
+  }
+  let allItems = [];
+  let done = 0;
+
+  filtered.forEach(src => {
+    fetchWithProxy(src.url).then(xml => {
+      if (xml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        const items = [...doc.querySelectorAll('item')].slice(0, 3);
+        items.forEach(item => {
+          const title = item.querySelector('title')?.textContent || '';
+          const link  = item.querySelector('link')?.textContent || '';
+          const pubDate = item.querySelector('pubDate')?.textContent || '';
+          if (title) allItems.push({ source: src.name, emoji: src.emoji, title, link, pubDate });
+        });
+      }
+    }).catch(() => {}).finally(() => {
+      done++;
+      if (done === filtered.length) renderNews(allItems);
+    });
+  });
+}
+
+function renderNews(items) {
+  const feed = document.getElementById('newsFeed');
+  if (!items.length) {
+    feed.innerHTML = '<div class="no-news">Could not load headlines.<br>Check your internet connection.</div>';
+    return;
+  }
+  feed.innerHTML = items.map(item => `
+    <div class="news-card" onclick="${item.link ? `window.open('${item.link}','_blank')` : ''}">
+      <div class="news-source">${item.emoji} ${item.source}</div>
+      <div class="news-headline">${item.title}</div>
+      <div class="news-date">${item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+    </div>
+  `).join('');
+}
+
+function closeSources() {
+  document.getElementById('sourcesModal').classList.remove('open');
+}
+
+function renderSources() {
+  const list = document.getElementById('sourcesList');
+  if (!sources.length) { list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:1rem 0;">No sources added yet.</div>'; return; }
+  list.innerHTML = sources.map((s,i) => `
+    <div class="source-item">
+      <div class="source-info">
+        <div class="source-name">${s.emoji} ${s.name}</div>
+        <div class="source-cat">${s.category}</div>
+      </div>
+      <button class="del-btn" onclick="deleteSource(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addSource() {
+  const name = document.getElementById('srcName').value.trim();
+  const emoji = document.getElementById('srcEmoji').value.trim() || '📰';
+  const category = document.getElementById('srcCat').value.trim() || 'General';
+  const url = document.getElementById('srcUrl').value.trim();
+  if (!name || !url) return;
+  sources.push({name, emoji, category, url});
+  save(); renderSources();
+  ['srcName','srcEmoji','srcCat','srcUrl'].forEach(id => document.getElementById(id).value = '');
+}
+
+function deleteSource(i) { sources.splice(i,1); save(); renderSources(); }
+
+// TO-DO
+function addTodo() {
+  const t = document.getElementById('todoInput').value.trim();
+  if (!t) return;
+  todos.push({text:t, done:false});
+  save(); renderTodos();
+  document.getElementById('todoInput').value = '';
+}
+
+function toggleTodo(i) { todos[i].done = !todos[i].done; save(); renderTodos(); }
+function deleteTodo(i) { todos.splice(i,1); save(); renderTodos(); }
+function clearDone() { todos = todos.filter(t => !t.done); save(); renderTodos(); }
+
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  if (!todos.length) { list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:2rem;">No tasks yet. Add one above.</div>'; return; }
+  list.innerHTML = todos.map((t,i) => `
+    <div class="todo-item">
+      <button class="todo-check ${t.done?'done':''}" onclick="toggleTodo(${i})">${t.done?'✓':''}</button>
+      <span class="todo-text ${t.done?'done':''}">${t.text}</span>
+      <button class="todo-del" onclick="deleteTodo(${i})">✕</button>
+    </div>`).join('');
+}
+
+// CALCULATOR
+function calcNum(n) {
+  if (calcNewNum) { calcVal = n; calcNewNum = false; }
+  else calcVal += n;
+  document.getElementById('calcDisplay').textContent = calcVal;
+}
+
+function calcDot() {
+  if (!calcVal.includes('.')) { calcVal += calcVal ? '.' : '0.'; calcNewNum = false; }
+  document.getElementById('calcDisplay').textContent = calcVal;
+}
+
+function calcOp(op) {
+  if (calcVal) { calcPrev = calcVal; calcOp2 = op; calcNewNum = true; }
+  document.getElementById('calcHistory').textContent = `${calcPrev} ${op}`;
+}
+
+function calcEquals() {
+  if (!calcPrev || !calcOp2 || !calcVal) return;
+  let a = parseFloat(calcPrev), b = parseFloat(calcVal), r;
+  if (calcOp2==='+') r=a+b; else if (calcOp2==='-') r=a-b;
+  else if (calcOp2==='*') r=a*b; else if (calcOp2==='/') r=b?a/b:'Error';
+  else if (calcOp2==='%') r=a*(b/100);
+  document.getElementById('calcHistory').textContent = `${a} ${calcOp2} ${b} =`;
+  calcVal = String(r); calcPrev = ''; calcOp2 = ''; calcNewNum = true;
+  document.getElementById('calcDisplay').textContent = calcVal;
+}
+
+function calcClear() {
+  calcVal=''; calcPrev=''; calcOp2=''; calcNewNum=true;
+  document.getElementById('calcDisplay').textContent='0';
+  document.getElementById('calcHistory').textContent='';
+}
+
+// VOICE
+function loadVoices() {
+  const load = () => {
+    voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+    if (!voices.length) voices = speechSynthesis.getVoices();
+    const sel = document.getElementById('voiceSelect');
+    sel.innerHTML = voices.map((v,i) => `<option value="${i}">${v.name}</option>`).join('');
+    if (selectedVoice) {
+      const idx = voices.findIndex(v => v.name===selectedVoice);
+      if (idx>=0) sel.value = idx;
+    }
+  };
+  load();
+  speechSynthesis.onvoiceschanged = load;
+}
+
+function updateVoice() {
+  const idx = document.getElementById('voiceSelect').value;
+  selectedVoice = voices[idx]?.name;
+  saveSettings();
+}
+
+function updateSliders() {
+  speechRate = parseFloat(document.getElementById('rateSlider').value);
+  speechPitch = parseFloat(document.getElementById('pitchSlider').value);
+  document.getElementById('rateVal').textContent = speechRate.toFixed(1)+'x';
+  const labels = ['Low','Normal','High'];
+  document.getElementById('pitchVal').textContent = speechPitch < 0.9 ? 'Low' : speechPitch > 1.1 ? 'High' : 'Normal';
+  saveSettings();
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = speechRate; u.pitch = speechPitch; u.lang = 'en-US';
+  const idx = document.getElementById('voiceSelect').value;
+  if (voices[idx]) u.voice = voices[idx];
+  speechSynthesis.speak(u);
+}
+
+function speakGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  speak(`${g}, ${userName}. Today is ${dateStr}.`);
+}
+
+function speakAgenda() {
+  const now = new Date();
+  const key = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+  const acts = activities[key] || [];
+  const h = now.getHours();
+  const g = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+  const dateStr = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  let text = `${g}, ${userName}. Today is ${dateStr}. `;
+  if (acts.length) {
+    text += `You have ${acts.length} ${acts.length===1?'activity':'activities'} today: `;
+    text += acts.map(a => a.title).join(', ') + '.';
+  } else {
+    text += 'You have no activities scheduled for today.';
+  }
+  const pending = todos.filter(t => !t.done);
+  if (pending.length) text += ` You have ${pending.length} pending tasks on your to-do list.`;
+  speak(text);
+}
+
+function testVoice() { speak('This is a test of your voice settings. Audio Agenda by Acas.'); }
+
+function saveName() {
+  const n = document.getElementById('nameEdit').value.trim();
+  if (!n) return;
+  userName = n; save(); updateGreeting();
+}
+
+// NAV
+function showScreen(s) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  document.getElementById('nav-'+s)?.classList.add('active');
+  if (s === 'news') { renderNewsFilters(); if (document.getElementById('newsFeed').children.length <= 1) loadNews(); }
+}
+
+// INIT
+load();
+if (localStorage.getItem('acas_registered') === 'true' && userName) {
+  document.getElementById('onboarding').style.display = 'none';
+  init();
+} else {
+  document.getElementById('onboarding').style.display = 'flex';
+}
+
+// EMAIL
+function sendEmail() {
+  const to = document.getElementById('emailTo').value.trim();
+  const subject = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
+  const status = document.getElementById('emailStatus');
+
+  if (!to || !body) {
+    status.textContent = '⚠️ Please enter a recipient and message.';
+    status.style.color = '#f5a623';
+    return;
+  }
+
+  status.textContent = 'Sending...';
+  status.style.color = 'var(--text-dim)';
+
+  emailjs.send('service_avtgs9a', 'template_r37goce', {
+    to_email: to,
+    subject: subject || 'Message from Audio Agenda · Acas',
+    message: body,
+    from_name: userName || 'Audio Agenda Acas'
+  }).then(() => {
+    status.textContent = '✅ Email sent successfully!';
+    status.style.color = '#5dd4a0';
+    document.getElementById('emailTo').value = '';
+    document.getElementById('emailSubject').value = '';
+    document.getElementById('emailBody').value = '';
+  }).catch(err => {
+    status.textContent = '❌ Error sending. Check your connection.';
+    status.style.color = '#ff8888';
+    console.error(err);
+  });
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>
