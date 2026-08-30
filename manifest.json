@@ -1,5 +1,5 @@
 {
-  name": "Audio Agenda by Acas",
+  "name": "Audio Agenda by Acas",
   "short_name": "AudioAgenda",
   "description": "Executive digital agenda with voice, news and WhatsApp integration",
   "start_url": "./index.html",
